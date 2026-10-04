@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Victoria — Espace Claire</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap');
+:root{--paper:#fdf8f0;--paper-2:#fef9f2;--ink:#2c2416;--ink-light:#6b5c3e;--ink-muted:#a89070;--ruled:#e8dcc8;--spiral:#c0a97a;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);font-family:'Nunito',sans-serif;min-height:100vh;}
+.header{background:var(--ink);color:var(--paper);padding:13px 16px;display:flex;align-items:center;gap:8px;}
+.header-title{font-family:'Caveat',cursive;font-size:20px;font-weight:700;flex:1;}
+.badge{background:var(--amber);color:#1a1209;font-size:11px;font-weight:700;font-family:'Caveat',cursive;padding:3px 9px;border-radius:20px;}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:20px;}
+.login-card{background:var(--paper-2);border:1px solid var(--ruled);border-radius:12px;padding:28px 22px;width:100%;max-width:320px;text-align:center;}
+.login-title{font-family:'Caveat',cursive;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.login-sub{font-size:13px;color:var(--ink-muted);margin-bottom:18px;}
+.login-card input[type=password]{width:100%;background:white;border:1px solid var(--ruled);border-radius:8px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--ink);outline:none;margin-bottom:10px;text-align:center;letter-spacing:4px;}
+.login-card input:focus{border-color:var(--spiral);}
+.btn-full{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:10px;font-family:'Caveat',cursive;font-size:17px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.btn-full:hover{opacity:.85;} .btn-full:disabled{opacity:.45;cursor:default;}
+.err-login{font-size:12px;color:var(--red);margin-top:6px;display:none;}
+#main-screen{display:none;}
+.main{padding:14px;}
+.section-title{font-family:'Caveat',cursive;font-size:19px;font-weight:700;color:var(--ink);margin-bottom:10px;padding-bottom:4px;border-bottom:2px solid var(--spiral);}
+.card{background:var(--paper-2);border:1px solid var(--ruled);border-radius:10px;padding:14px;margin-bottom:16px;}
+.field-label{font-family:'Caveat',cursive;font-size:13px;color:var(--ink-muted);display:block;margin-bottom:5px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.chip{font-size:12px;font-family:'Caveat',cursive;font-weight:600;padding:3px 10px;border-radius:20px;cursor:pointer;border:1.5px solid var(--ruled);background:#ede6d6;color:var(--ink-light);transition:all .15s;}
+.chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.upload-zone{border:2px dashed var(--ruled);border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:white;transition:border-color .2s;margin-bottom:10px;position:relative;}
+.upload-zone:hover{border-color:var(--spiral);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:32px;margin-bottom:6px;}
+.upload-label{font-family:'Caveat',cursive;font-size:15px;color:var(--ink-muted);line-height:1.5;}
+.preview-img{width:100%;border-radius:8px;margin-bottom:10px;max-height:220px;object-fit:cover;display:none;}
+.or-div{display:flex;align-items:center;gap:8px;margin:10px 0;}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--ruled);}
+.or-text{font-family:'Caveat',cursive;font-size:13px;color:var(--ink-muted);}
+textarea{width:100%;min-height:80px;background:white;border:1px solid var(--ruled);border-radius:8px;padding:9px 11px;font-family:'Nunito',sans-serif;font-size:13px;color:var(--ink);outline:none;resize:vertical;line-height:1.6;}
+textarea:focus{border-color:var(--spiral);}
+.transcription-box{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--ink-light);line-height:1.6;margin-bottom:10px;display:none;max-height:140px;overflow-y:auto;}
+.status{font-family:'Caveat',cursive;font-size:14px;text-align:center;padding:9px;border-radius:8px;margin-top:8px;display:none;}
+.status.ok{background:#f0fdf4;color:#15803d;border:1px solid #86efac;}
+.status.err{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+.status.loading{background:var(--paper-2);color:var(--ink-muted);border:1px solid var(--ruled);animation:pulse 1.2s infinite;}
+.stats-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.stat-box{background:var(--paper-2);border:1px solid var(--ruled);border-radius:8px;padding:10px;text-align:center;}
+.stat-n{font-family:'Caveat',cursive;font-size:26px;font-weight:700;color:var(--ink);}
+.stat-l{font-size:10px;color:var(--ink-muted);}
+.filter-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.q-item{background:white;border:1px solid var(--ruled);border-radius:8px;padding:10px 12px;margin-bottom:7px;position:relative;}
+.q-item::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:4px;border-radius:0 2px 2px 0;background:var(--amber);}
+.q-text{font-family:'Caveat',cursive;font-size:15px;font-weight:600;color:var(--ink);margin-bottom:3px;line-height:1.4;}
+.q-ans{font-size:12px;color:var(--ink-muted);line-height:1.4;}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.mat-badge{font-size:10px;font-family:'Caveat',cursive;font-weight:700;padding:2px 8px;border-radius:10px;background:#ede6d6;color:var(--ink-light);}
+.q-del{background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;font-family:'Caveat',cursive;font-weight:600;}
+.empty{font-family:'Caveat',cursive;font-size:14px;color:var(--ink-muted);text-align:center;padding:18px;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-title">Carnet de Victoria</div>
+  <div class="badge">Espace Claire</div>
+</div>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-title">Espace prof 🔐</div>
+    <div class="login-sub">Entre le code pour accéder</div>
+    <input type="password" id="pwd-input" placeholder="• • • • • •" onkeydown="if(event.key==='Enter')checkPwd()">
+    <button class="btn-full" onclick="checkPwd()">Accéder →</button>
+    <div class="err-login" id="err-login">Code incorrect !</div>
+  </div>
+</div>
+
+<div id="main-screen">
+<div class="main">
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-n" id="s-total">—</div><div class="stat-l">questions au total</div></div>
+    <div class="stat-box"><div class="stat-n" id="s-mats">—</div><div class="stat-l">matières couvertes</div></div>
+  </div>
+
+  <div class="section-title">Ajouter un cours</div>
+  <div class="card">
+    <span class="field-label">Matière</span>
+    <div class="chips" id="mat-chips">
+      <div class="chip active" data-mat="Maths" onclick="selMat(this)">Maths</div>
+      <div class="chip" data-mat="Français" onclick="selMat(this)">Français</div>
+      <div class="chip" data-mat="Histoire-Géo" onclick="selMat(this)">Histoire-Géo</div>
+      <div class="chip" data-mat="SVT" onclick="selMat(this)">SVT</div>
+      <div class="chip" data-mat="Physique" onclick="selMat(this)">Physique</div>
+      <div class="chip" data-mat="Anglais" onclick="selMat(this)">Anglais</div>
+    </div>
+    <span class="field-label">Photo du cahier de Victoria 📷</span>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+      <div class="upload-icon">📷</div>
+      <div class="upload-label">Prendre une photo ou choisir une image<br><span style="font-size:11px;opacity:.6">Le cours sera transcrit automatiquement</span></div>
+    </div>
+    <img id="preview-img" class="preview-img">
+    <div class="transcription-box" id="transcription-box"></div>
+    <div class="or-div"><span class="or-text">ou colle le texte directement</span></div>
+    <textarea id="course-text" placeholder="Colle le cours ici…"></textarea>
+    <div class="status" id="gen-status"></div>
+    <button class="btn-full" id="gen-btn" style="margin-top:10px" onclick="generateQuestions()">Générer les questions pour Victoria →</button>
+  </div>
+
+  <div class="section-title">Questions enregistrées</div>
+  <div class="filter-chips" id="filter-chips">
+    <div class="chip active" data-filter="Tout" onclick="selFilter(this)">Toutes</div>
+  </div>
+  <div id="questions-list"></div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SB_URL='https://wfulvjyvoxsqwbmlqeie.supabase.co';
+const SB_KEY='sb_publishable_nlUN5elZdkYlqWaQUnNTZg_Vm9QYSgf';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const PWD='victoria2027';
+let currentMat='Maths',currentFilter='Tout',allQ=[];
+let photoB64=null,photoMime=null;
+
+function checkPwd(){
+  if(document.getElementById('pwd-input').value===PWD){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-screen').style.display='block';
+    loadQ();
+  } else {
+    document.getElementById('err-login').style.display='block';
+  }
+}
+
+function selMat(el){document.querySelectorAll('#mat-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');currentMat=el.dataset.mat;}
+function selFilter(el){document.querySelectorAll('#filter-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');currentFilter=el.dataset.filter;renderQ();}
+
+async function handlePhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const dataUrl=e.target.result;
+    photoMime=file.type;photoB64=dataUrl.split(',')[1];
+    const img=document.getElementById('preview-img');img.src=dataUrl;img.style.display='block';
+    document.getElementById('upload-zone').style.display='none';
+    const st=document.getElementById('gen-status');
+    st.style.display='block';st.className='status loading';st.textContent='Transcription du cours en cours… 📖';
+    try{
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:photoMime,data:photoB64}},
+          {type:'text',text:'Transcris fidèlement et proprement ce cours manuscrit. Garde la structure (titres, listes, paragraphes). Corrige les fautes évidentes. Réponds uniquement avec la transcription, sans commentaire.'}
+        ]}]})});
+      const d=await r.json();
+      const txt=d.content.find(b=>b.type==='text')?.text||'';
+      document.getElementById('course-text').value=txt;
+      const box=document.getElementById('transcription-box');
+      box.style.display='block';
+      box.innerHTML='<strong style="font-family:Caveat,cursive;font-size:13px;color:#15803d">✓ Cours transcrit :</strong><br><span style="white-space:pre-wrap">'+txt+'</span>';
+      st.style.display='none';
+    }catch(err){
+      st.className='status err';st.textContent='Erreur de transcription. Colle le texte manuellement.';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function generateQuestions(){
+  const text=document.getElementById('course-text').value.trim();
+  const st=document.getElementById('gen-status');
+  if(!text){st.style.display='block';st.className='status err';st.textContent='Colle le cours ou prends une photo !';return;}
+  const btn=document.getElementById('gen-btn');btn.disabled=true;
+  st.style.display='block';st.className='status loading';st.textContent='Génération des questions… ✍️';
+  const prompt=`Tu es un assistant pédagogique pour Victoria, 14 ans, brevet 2027.\nMatière : ${currentMat}\nCours :\n---\n${text}\n---\nGénère exactement 5 questions de récupération active variées (compréhension, liens, application).\nRéponds UNIQUEMENT en JSON valide sans markdown :\n{"questions":[{"q":"...","r":"..."},{"q":"...","r":"..."},{"q":"...","r":"..."},{"q":"...","r":"..."},{"q":"...","r":"..."}]}\nRéponses courtes (1-2 phrases).`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    const raw=d.content.find(b=>b.type==='text')?.text||'';
+    const parsed=JSON.parse(raw);
+    const inserts=parsed.questions.map(q=>({id:'q_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),matiere:currentMat,question:q.q,reponse:q.r}));
+    const{error}=await sb.from('questions').insert(inserts);if(error)throw error;
+    allQ=[...inserts,...allQ];renderStats();renderFilters();renderQ();
+    document.getElementById('course-text').value='';
+    document.getElementById('transcription-box').style.display='none';
+    document.getElementById('preview-img').style.display='none';
+    document.getElementById('upload-zone').style.display='block';
+    document.getElementById('photo-input').value='';
+    photoB64=null;
+    st.className='status ok';st.textContent=`✓ ${inserts.length} questions ajoutées pour Victoria !`;
+    setTimeout(()=>{st.style.display='none';},4000);
+  }catch(e){st.className='status err';st.textContent='Erreur. Réessaie !';console.error(e);}
+  btn.disabled=false;
+}
+
+async function loadQ(){
+  const{data}=await sb.from('questions').select('*').order('created_at',{ascending:false});
+  allQ=data||[];renderStats();renderFilters();renderQ();
+}
+function renderStats(){
+  document.getElementById('s-total').textContent=allQ.length||'—';
+  document.getElementById('s-mats').textContent=new Set(allQ.map(q=>q.matiere)).size||'—';
+}
+function renderFilters(){
+  const mats=[...new Set(allQ.map(q=>q.matiere))];
+  const fc=document.getElementById('filter-chips');
+  fc.innerHTML='<div class="chip active" data-filter="Tout" onclick="selFilter(this)">Toutes</div>';
+  mats.forEach(m=>{const d=document.createElement('div');d.className='chip';d.dataset.filter=m;d.textContent=m;d.onclick=function(){selFilter(this);};fc.appendChild(d);});
+}
+function renderQ(){
+  const filtered=currentFilter==='Tout'?allQ:allQ.filter(q=>q.matiere===currentFilter);
+  if(!filtered.length){document.getElementById('questions-list').innerHTML='<div class="empty">Aucune question — ajoute un cours !</div>';return;}
+  document.getElementById('questions-list').innerHTML=filtered.map(q=>`
+    <div class="q-item">
+      <div class="q-text">${q.question}</div>
+      <div class="q-ans">↳ ${q.reponse}</div>
+      <div class="q-meta"><span class="mat-badge">${q.matiere}</span><button class="q-del" onclick="delQ('${q.id}')">Supprimer</button></div>
+    </div>`).join('');
+}
+async function delQ(id){
+  await sb.from('questions').delete().eq('id',id);
+  allQ=allQ.filter(q=>q.id!==id);renderStats();renderFilters();renderQ();
+}
+</script>
+</body>
+</html>
