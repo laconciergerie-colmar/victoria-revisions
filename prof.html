@@ -150,7 +150,7 @@ async function handlePhoto(input){
     const st=document.getElementById('gen-status');
     st.style.display='block';st.className='status loading';st.textContent='Transcription du cours en cours… 📖';
     try{
-      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:photoMime,data:photoB64}},
           {type:'text',text:'Transcris fidèlement et proprement ce cours manuscrit. Garde la structure (titres, listes, paragraphes). Corrige les fautes évidentes. Réponds uniquement avec la transcription, sans commentaire.'}
@@ -177,7 +177,7 @@ async function generateQuestions(){
   st.style.display='block';st.className='status loading';st.textContent='Génération des questions… ✍️';
   const prompt=`Tu es un assistant pédagogique pour Victoria, 14 ans, brevet 2027.\nMatière : ${currentMat}\nCours :\n---\n${text}\n---\nGénère exactement 5 questions de récupération active variées (compréhension, liens, application).\nRéponds UNIQUEMENT en JSON valide sans markdown :\n{"questions":[{"q":"...","r":"..."},{"q":"...","r":"..."},{"q":"...","r":"..."},{"q":"...","r":"..."},{"q":"...","r":"..."}]}\nRéponses courtes (1-2 phrases).`;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
     const raw=d.content.find(b=>b.type==='text')?.text||'';

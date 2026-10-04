@@ -269,7 +269,7 @@ async function checkAns(){
   inp.disabled=true;const btn=document.querySelector('.btn-check');btn.disabled=true;btn.textContent='…';
   const q=queue[idx];let ok=false;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:80,messages:[{role:'user',content:`Question:"${q.question}"\nRéponse attendue:"${q.reponse}"\nRéponse élève:"${val}"\nCorrect même si formulé différemment? JSON: {"ok":true} ou {"ok":false}`}]})});
     const d=await r.json();ok=JSON.parse(d.content.find(b=>b.type==='text')?.text||'{"ok":false}').ok;
   }catch(e){ok=false;}
